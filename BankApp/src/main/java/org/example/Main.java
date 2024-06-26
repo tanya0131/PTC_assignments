@@ -89,7 +89,26 @@ public class Main {
                 }
             } while (ch != 8);
 
-        } catch (Exception e) {
+
+        }
+        catch (InvalidAccountException iae) {
+            System.out.println(iae.getMessage());
+        }
+        catch (InvalidMobileNumberException imne) {
+            System.out.println(imne.getMessage());
+        }
+        catch(InvalidinitialbalException iie){
+            System.out.println(iie.getMessage());
+        }
+        catch(invalidamountexception iv)
+        {
+            System.out.println(iv.bal + iv.msg + "You cannot withraw/deposit a negative amount " );
+        }
+        catch(lessbalanceexception lb)
+        {
+            System.out.println("balance is less than withrawal/transfer amount("+ lb.withdrawamount +"). Your balance present is "+ lb.b );
+        }
+        catch (Exception e) {
             System.out.println("An unexpected error occurred: " + e.getMessage());
         } finally {
             scanner.close();

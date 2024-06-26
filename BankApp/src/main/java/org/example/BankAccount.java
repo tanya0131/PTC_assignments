@@ -7,13 +7,23 @@ class BankAccount {
     private String mobileNumber;
     private List<String> transactionHistory;
 
-    public BankAccount(String accountHolderName, double initialBalance, String mobileNumber) {
-        this.accountNumber = generateAccountNumber();
-        this.accountHolderName = accountHolderName;
-        this.balance = initialBalance;
-        this.mobileNumber = mobileNumber;
-        this.transactionHistory = new ArrayList<>();
-        transactionHistory.add("Account created with balance " + initialBalance);
+    public BankAccount(String accountHolderName, double initialBalance, String mobileNumber) throws InvalidMobileNumberException,InvalidinitialbalException {
+        if(mobileNumber.matches("[0-9]{10}") && initialBalance>0)
+        {
+            this.accountNumber = generateAccountNumber();
+            this.accountHolderName = accountHolderName;
+            this.balance = initialBalance;
+            this.mobileNumber = mobileNumber;
+            this.transactionHistory = new ArrayList<>();
+            transactionHistory.add("Account created with balance " + initialBalance);
+        }
+        else if (!mobileNumber.matches("[0-9]{10}")) {
+            throw new InvalidMobileNumberException(mobileNumber);
+        }
+        else if(initialBalance<=0){
+            throw new InvalidinitialbalException(initialBalance);
+        }
+
     }
 
     private String generateAccountNumber() {
@@ -45,31 +55,44 @@ class BankAccount {
         return transactionHistory;
     }
 
-    public void deposit(double amount) {
+    public void deposit(double amount) throws invalidamountexception {
         if (amount > 0) {
             balance += amount;
             transactionHistory.add("Deposited: " + amount + ", New Balance: " + balance);
         } else {
-            System.out.println("Invalid deposit amount.");
+            throw new invalidamountexception(amount);
         }
     }
 
-    public void withdraw(double amount) {
-        if (amount > 0 && amount <= balance) {
+    public void withdraw(double amount) throws invalidamountexception,lessbalanceexception {
+        if(amount<0)
+        {
+            throw new invalidamountexception(amount);
+        }
+        else if(amount>balance){
+
+            throw new lessbalanceexception(amount,balance);
+        }
+        else{
             balance -= amount;
             transactionHistory.add("Withdrew: " + amount + ", New Balance: " + balance);
-        } else {
-            System.out.println("Invalid withdrawal amount.");
         }
+
     }
 
-    public void transfer(BankAccount toAccount, double amount) {
-        if (amount > 0 && amount <= balance) {
+    public void transfer(BankAccount toAccount, double amount) throws invalidamountexception, lessbalanceexception {
+        if(amount<0)
+        {
+            throw new invalidamountexception(amount);
+        }
+        else if(amount>balance){
+
+            throw new lessbalanceexception(amount,balance);
+        }
+        else{
             balance -= amount;
             toAccount.deposit(amount);
             transactionHistory.add("Transferred: " + amount + " to Account: " + toAccount.getAccountNumber() + ", New Balance: " + balance);
-        } else {
-            System.out.println("Invalid transfer amount.");
         }
     }
 
@@ -81,5 +104,36 @@ class BankAccount {
     public void updateMobileNumber(String newNumber) {
         mobileNumber = newNumber;
         transactionHistory.add("Account holder mobile number changed to: " + newNumber);
+    }
+}
+
+
+class invalidamountexception extends Exception{
+
+    String msg=" ";
+    double bal;
+    public invalidamountexception(double amount)
+    {
+        msg = "You have entered a negative amount.";
+        bal = amount;
+    }
+
+}
+
+class lessbalanceexception extends Exception{
+
+    double withdrawamount;
+    double b;
+    public lessbalanceexception(double amount,double balance)
+    {
+        withdrawamount = amount;
+        b = balance;
+    }
+}
+
+class InvalidinitialbalException extends Exception
+{
+    public  InvalidinitialbalException(double initialBalance) {
+        super("Minimum balance to open a account should be greater than 0");
     }
 }

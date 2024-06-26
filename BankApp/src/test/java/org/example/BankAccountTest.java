@@ -11,25 +11,25 @@ class BankAccountTest {
 
     BankAccount account;
     @BeforeEach
-    void setUp() {
+    void setUp() throws InvalidMobileNumberException, InvalidinitialbalException {
         account = new BankAccount("Tanya", 1000.0, "1234567890");
     }
 
     @Test
-    void testDeposit() {
+    void testDeposit() throws invalidamountexception {
         account.deposit(500.0);
         assertEquals(1500.0, account.getBalance());
     }
 
     @Test
-    void testWithdraw() {
+    void testWithdraw() throws invalidamountexception, lessbalanceexception {
         account.withdraw(500.0);
         assertEquals(500.0, account.getBalance());
     }
 
 
     @Test
-    void testTransfer() {
+    void testTransfer() throws invalidamountexception, lessbalanceexception, InvalidMobileNumberException, InvalidinitialbalException {
         BankAccount toAccount = new BankAccount("Saurabh", 500.0, "0987654321");
         account.transfer(toAccount, 300.0);
         assertEquals(700.0, account.getBalance());
@@ -49,7 +49,7 @@ class BankAccountTest {
     }
 
     @Test
-    void testTransactionHistory() {
+    void testTransactionHistory() throws invalidamountexception, lessbalanceexception {
         account.deposit(500.0);
         account.withdraw(200.0);
         List<String> history = account.getTransactionHistory();

@@ -8,23 +8,24 @@ class Bank {
         accounts = new HashMap<>();
     }
 
-    public String createAccount(String accountHolderName, double initialBalance, String mobileNumber) {
+    public String createAccount(String accountHolderName, double initialBalance, String mobileNumber) throws InvalidMobileNumberException, InvalidinitialbalException {
         BankAccount newAccount = new BankAccount(accountHolderName, initialBalance, mobileNumber);
         accounts.put(newAccount.getAccountNumber(), newAccount);
         System.out.println("Account created successfully with Account Number: " + newAccount.getAccountNumber() + "  With Name : " + newAccount.getAccountHolderName());
         return newAccount.getAccountNumber();
     }
 
-    public void deleteAccount(String accountNumber) {
+    public void deleteAccount(String accountNumber) throws InvalidAccountException {
         if (accounts.containsKey(accountNumber)) {
             accounts.remove(accountNumber);
             System.out.println("Account deleted successfully");
         } else {
-            System.out.println("Account not found");
+            throw new InvalidAccountException(accountNumber);
         }
     }
 
-    public void updateAccountDetails(String accountNumber) {
+
+    public void updateAccountDetails(String accountNumber) throws InvalidAccountException, InvalidMobileNumberException {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Which field do you want to update?");
         System.out.println("1.) Account Holder Name 2.) Linked Mobile Number");
@@ -41,21 +42,34 @@ class Bank {
                 case 2:
                     System.out.println("Enter the new Mobile Number:");
                     String newMobileNumber = scanner.nextLine();
-                    account.updateMobileNumber(newMobileNumber);
+                    if (newMobileNumber.matches("[0-9]{10}")) { // Assuming a valid mobile number has 10 digits
+                        account.updateMobileNumber(newMobileNumber);
+                    } else {
+                        throw new InvalidMobileNumberException(newMobileNumber);
+                    }
                     break;
                 default:
                     System.out.println("Invalid choice");
             }
         } else {
-            System.out.println("Account not found");
+            throw new InvalidAccountException(accountNumber);
         }
     }
 
-    public BankAccount getAccount(String accountNumber) {
-        return accounts.get(accountNumber);
+
+    public BankAccount getAccount(String accountNumber) throws InvalidAccountException{
+        if(accounts.containsKey(accountNumber))
+        {
+            return accounts.get(accountNumber);
+        }
+        else{
+
+            throw new InvalidAccountException(accountNumber);
+
+        }
     }
 
-    public void printAccountDetails(String accountNumber) {
+    public void printAccountDetails(String accountNumber) throws InvalidAccountException {
         BankAccount account = accounts.get(accountNumber);
         if (account != null) {
             System.out.println("Account Number: " + account.getAccountNumber());
@@ -64,7 +78,19 @@ class Bank {
             System.out.println("Mobile Number: " + account.getMobileNumber());
             System.out.println("Transaction History: " + account.getTransactionHistory());
         } else {
-            System.out.println("Account not found.");
+            throw new InvalidAccountException(accountNumber);
         }
+    }
+}
+
+class InvalidAccountException extends Exception {
+    public InvalidAccountException(String accountNumber) {
+        super("Invalid account number: " + accountNumber);
+    }
+}
+
+class InvalidMobileNumberException extends Exception {
+    public InvalidMobileNumberException(String mobileNumber) {
+        super("Invalid mobile number: " + mobileNumber + "Enter a 10 digit mobile number");
     }
 }
